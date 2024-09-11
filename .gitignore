@@ -1,0 +1,16 @@
+__pycache__/
+mynotes.txt
+fcn_turbolence_prediction/converted_models/*
+fcn_turbolence_prediction/conf/config copy.py
+fcn_turbolence_prediction/conf/config_legit.py
+fcn_turbolence_prediction/numpy_data/*
+fcn_turbolence_prediction/sample_data/*
+fcn_turbolence_prediction/src/.logs/*
+fcn_turbolence_prediction/src/.predictions/*
+model_compression/Benchmark_Results/*
+model_compression/benchmarks/run/pretrain/*
+model_compression/benchmarks/run/prune/*
+model_compression/tools/torch_pruning/pruner/algorithms/expressive_pruner.py
+model_compression/tools/torch_pruning/pruner/algorithms/pruneinator.py
+torch_pruning/pruner/algorithms/pruneinator.py
+torch_pruning/pruner/algorithms/expressive_pruner.py
