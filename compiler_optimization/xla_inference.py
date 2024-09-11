@@ -26,6 +26,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = "3"
 os.environ['MODEL_CNN'] = "WallRecon"
 
 import tensorflow as tf
+from tqdm import tqdm
 from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
 VARS_NAME_OUT = ('u','v','w')
@@ -312,8 +313,8 @@ def thres_relu(x):
 
 if __name__ == "__main__":
 
-    INFERENCE_STEPS = 3000
-    WARMUP_STEPS = 2000
+    INFERENCE_STEPS = 1000
+    WARMUP_STEPS = 200
 
     parser = argparse.ArgumentParser()
 
@@ -326,7 +327,7 @@ if __name__ == "__main__":
     parser.add_argument("--restore-path", type=str, required=False)
 
     parser.add_argument('--precision', dest="precision", type=str, default="fp16", choices=['int8', 'fp16', 'fp32'], help='Precision')
-    parser.add_argument('--batch_size', dest="batch_size", type=int, default=4, help='Batch size')
+    parser.add_argument('--batch_size', dest="batch_size", type=int, default=1, help='Batch size')
     parser.add_argument('--batch_size_inference', type=int, default=1, help='Batch size for inference latency evaluation')
     parser.add_argument('--n_vars_out', type=int, default=3)
 
@@ -382,9 +383,9 @@ if __name__ == "__main__":
     if args.use_openxla:
         try:
             step_times = list()
-            for step in range(1, INFERENCE_STEPS + 1):
-                if step % 100 == 0:
-                    print("Processing step: %04d ..." % step)
+            for step in tqdm(range(1, INFERENCE_STEPS + 1)):
+                #if step % 100 == 0:
+                    #print("Processing step: %04d ..." % step)
                 start_t = time.perf_counter()
                 xla_fn(X_sampled)
                 """
@@ -402,7 +403,7 @@ if __name__ == "__main__":
             pass
 
         print("\n=========================================")
-        print("Inference using: XLA Optimized Graph...")
+        print("Inference using: XLA Optimized Model...")
         avg_step_time = mean(step_times)
         print("\nAverage step time: %.1f msec" % (avg_step_time * 1e3))
         print("Average throughput: %d samples/sec" % (
@@ -412,9 +413,9 @@ if __name__ == "__main__":
     else: 
         try:
             step_times = list()
-            for step in range(1, INFERENCE_STEPS + 1):
-                if step % 100 == 0:
-                    print("Processing step: %04d ..." % step)
+            for step in tqdm(range(1, INFERENCE_STEPS + 1)):
+                #if step % 100 == 0:
+                    #print("Processing step: %04d ..." % step)
                 start_t = time.perf_counter()
                 a = CNN_model.predict(X_sampled, verbose=0)
                 """
@@ -432,7 +433,7 @@ if __name__ == "__main__":
             pass
 
         print("\n=========================================")
-        print("Inference using: Default Compiler Graph ...")
+        print("Inference using: Default TensorFlow Model...")
         avg_step_time = mean(step_times)
         print("\nAverage step time: %.1f msec" % (avg_step_time * 1e3))
         print("Average throughput: %d samples/sec" % (
@@ -446,13 +447,27 @@ if __name__ == "__main__":
     if args.use_openxla:
         Y_pred_xla = np.ndarray((n_samples_tot,args.n_vars_out,
                             model_config['nx_'],model_config['nz_']),dtype='float') 
-        
-        b = []
-        for start_idx in range(0, n_samples_tot):
+
+        for start_idx in range(0, n_samples_tot, args.batch_size_inference):
             end_idx = min(start_idx + args.batch_size_inference, n_samples_tot)
-            batch = X_sampled[start_idx:end_idx]
+            batch = X_test_data[start_idx:end_idx]
             batch_prediction = xla_fn(batch)
-            b.append(np.array(batch_prediction[0]))
+            Y_pred_xla[start_idx:end_idx, 0, :, :] = np.squeeze(np.array(batch_prediction[0]))
+            Y_pred_xla[start_idx:end_idx, 1, :, :] = np.squeeze(np.array(batch_prediction[1]))
+            Y_pred_xla[start_idx:end_idx, 2, :, :] = np.squeeze(np.array(batch_prediction[2]))
+
+        if app.SCALE_OUTPUT == True:
+            u_rms = model_config['rms'][0]\
+                    [model_config['ypos_Ret'][str(app.TARGET_YP)]]
+            
+            for i in range(app.N_VARS_OUT):
+                print('Rescale back component '+str(i)) 
+                Y_pred_xla[:,i] *= model_config['rms'][i]\
+                    [model_config['ypos_Ret'][str(app.TARGET_YP)]]/\
+                    u_rms
+                Y_test_data[:,i] *= model_config['rms'][i]\
+                    [model_config['ypos_Ret'][str(app.TARGET_YP)]]/\
+                    u_rms
 
         overall_mse_per_dimension_xla = get_mse_per_dim(args.n_vars_out, Y_pred_xla, Y_test_data, VARS_NAME_OUT)
 

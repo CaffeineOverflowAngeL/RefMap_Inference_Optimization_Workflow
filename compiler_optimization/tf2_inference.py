@@ -172,8 +172,8 @@ def load_with_converter(path, precision, batch_size):
 
 if __name__ == "__main__":
 
-    INFERENCE_STEPS = 10000
-    WARMUP_STEPS = 2000
+    INFERENCE_STEPS = 1000
+    WARMUP_STEPS = 100
 
     parser = argparse.ArgumentParser()
 
