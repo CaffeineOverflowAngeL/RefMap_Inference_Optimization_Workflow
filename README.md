@@ -1,6 +1,8 @@
 # RefMap Workflow for enabling efficient DL models
 
-![Inference Optimization Workflow](assets/ML_workflow_v1.png)
+<p align="center">
+  <img src="assets/ML_workflow_v1.png" alt="Inference Optimization Workflow" />
+</p>
 
 ## Model Compression 
 
