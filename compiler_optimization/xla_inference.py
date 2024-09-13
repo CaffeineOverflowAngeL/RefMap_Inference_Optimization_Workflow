@@ -313,8 +313,8 @@ def thres_relu(x):
 
 if __name__ == "__main__":
 
-    INFERENCE_STEPS = 1000
-    WARMUP_STEPS = 200
+    INFERENCE_STEPS = 500
+    WARMUP_STEPS = 100
 
     parser = argparse.ArgumentParser()
 
@@ -326,7 +326,7 @@ if __name__ == "__main__":
     parser.add_argument("--restore-format", type=str, choices=["h5", "hdf5"], default="h5")
     parser.add_argument("--restore-path", type=str, required=False)
 
-    parser.add_argument('--precision', dest="precision", type=str, default="fp16", choices=['int8', 'fp16', 'fp32'], help='Precision')
+    parser.add_argument('--precision', dest="precision", type=str, default="fp32", choices=['int8', 'fp16', 'fp32'], help='Precision')
     parser.add_argument('--batch_size', dest="batch_size", type=int, default=1, help='Batch size')
     parser.add_argument('--batch_size_inference', type=int, default=1, help='Batch size for inference latency evaluation')
     parser.add_argument('--n_vars_out', type=int, default=3)
@@ -338,6 +338,7 @@ if __name__ == "__main__":
     print("Inference using: {} ...".format(
         "XLA" if args.use_openxla else "Native TensorFlow")
     )
+    print(tf.__version__)
     print("Batch size:", args.batch_size)
     if args.use_openxla:
         print("Precision: ", args.precision)
@@ -479,11 +480,11 @@ if __name__ == "__main__":
         if args.n_vars_out == 2:
             start_time=time.time()
             (Y_pred[:,0,np.newaxis], Y_pred[:,1,np.newaxis]) = CNN_model.predict(
-                X_test_data, batch_size=args.batch_size)
+                X_test_data, batch_size=args.batch_size, verbose=0)
             end_time=time.time()
         if args.n_vars_out == 3:
             (Y_pred[:,0,np.newaxis], Y_pred[:,1,np.newaxis], Y_pred[:,2,np.newaxis]) = \
-                CNN_model.predict(X_test_data, batch_size=args.batch_size)
+                CNN_model.predict(X_test_data, batch_size=args.batch_size, verbose=0)
             
         if app.SCALE_OUTPUT == True:
             u_rms = model_config['rms'][0]\
