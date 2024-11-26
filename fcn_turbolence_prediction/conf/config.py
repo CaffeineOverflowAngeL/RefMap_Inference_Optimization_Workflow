@@ -26,18 +26,9 @@ class WallRecon:
     # Input for 'CUDA_VISIBLE_DEVICES'
 
     # Dataset definition
-    #CUR_PATH = '/home/angel/RefMap_Workflow/fcn_turbolence_prediction/src' # Default
-    CUR_PATH = '/home/angel/RefMap_Workflow/compiler_optimization' # for inference optimization by compilation
-    DS_PATH = '/home/angel/RefMap_Workflow/fcn_turbolence_prediction/sample_data/yp30/Train' # Provide the absolute PATH
-    DS_PATH_TEST = '/home/angel/RefMap_Workflow/fcn_turbolence_prediction/sample_data/yp15/Test' # Provide the absolute PATH
-    #DS_PATH = '../storage/Ret180/yp15/Train'
-    #DS_PATH = '../storage/Ret180/yp30/Train'
-    #DS_PATH = '../storage/Ret180/yp50/Train'
-    #DS_PATH = '../storage/Ret180/yp100/Train'
-    #DS_PATH_TEST = '../storage/Ret180/yp15/Test'
-    #DS_PATH_TEST = '../storage/Ret180/yp30/Test'
-    #DS_PATH_TEST = '../storage/Ret180/yp50/Test'
-    #DS_PATH_TEST = '../storage/Ret180/yp100/Test'
+    CUR_PATH = 'fcn_turbolence_prediction/src' # Default
+    DS_PATH = 'fcn_turbolence_prediction/sample_data/yp30/Train' # Provide the absolute PATH
+    DS_PATH_TEST = 'fcn_turbolence_prediction/sample_data/yp15/Test' # Provide the absolute PATH
 
 
     N_DATASETS = 1
@@ -45,18 +36,12 @@ class WallRecon:
     N_SAMPLES_TRAIN = (4400 #, 4400, 4400,
                        #4440, 4400, 4400, 4440, 4400, 4400, 
                        )
-    #N_DATASETS = 6 #18
-    #N_SAMPLES_TRAIN = (4440, 4440, 4440, 4440, 4440, 4440)
-    #N_SAMPLES_TRAIN = (1400, 1400, 1400, 1400, 1400, 1400, \
-                       #1400, 1400, 1400, 1400, 1400, 1400, \
-                       #1400, 1400, 1400, 1400, 1400, 1400) 
-                      # list of length N_DATASETS 
-    INTERV_TRAIN = 3 # TODO: IT WAS 3, CHANGE BACK
+
+    INTERV_TRAIN = 3
 
     N_SAMPLES_TEST = (4200) #*8
     INTERV_TEST = 1 
 
-    #TIMESTAMP = '1562346575'
     TIMESTAMP = '1588580899'
     FROM_CKPT = True
     CKPT = 50
